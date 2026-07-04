@@ -1,0 +1,9 @@
+lightgbm==4.6.0
+pandas
+numpy
+scikit-learn
+scipy
+joblib
+pyarrow
+streamlit
+plotly

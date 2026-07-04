@@ -1,0 +1,18 @@
+__pycache__/
+*.pyc
+*.DS_Store
+public_data/
+venv/
+naisc-venv/
+
+# Generated outputs
+report.json
+
+# Streamlit
+.streamlit/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# OS
+Thumbs.db
