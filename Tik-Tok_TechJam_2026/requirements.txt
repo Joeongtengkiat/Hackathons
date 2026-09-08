@@ -1,0 +1,11 @@
+PyQt6>=6.5
+numpy>=1.24
+Pillow>=10.0
+matplotlib>=3.7
+scikit-learn>=1.3
+
+# The trained detector (app/detectors/clip_head.py). The CLIP weights ship
+# inside models/bundle.pt, so transformers is only needed to build the tower -
+# nothing is downloaded at run time.
+torch>=2.0
+transformers>=4.40

@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+sample_data/
+data/
+predictions.json
+*_report.json
+models/*
+!models/.gitkeep
+venv/
