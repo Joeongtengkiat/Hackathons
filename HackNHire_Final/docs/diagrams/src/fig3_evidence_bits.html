@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en-GB"><head><meta charset="utf-8"><title>Evidence bits</title>
+<link rel="stylesheet" href="common.css">
+<style>
+  :root { --g-base: #dbe8f6; --g-clear: #f9dcd7; --g-alert: #fbeccc; --g-derived: #e6e1f3; }
+  .word { display: grid; grid-template-columns: repeat(16, 1fr); border: 1px solid #9aa3ad; border-radius: 4px; overflow: hidden; }
+  .nums { display: grid; grid-template-columns: repeat(16, 1fr); font-size: 10.5px; color: var(--muted); text-align: center; margin: 0 0 2px; }
+  .f { border-left: 1px solid #9aa3ad; height: 92px; display: flex; align-items: center; justify-content: center; text-align: center;
+       font-size: 11.5px; line-height: 1.15; padding: 2px; }
+  .f:first-child { border-left: 0; }
+  .v { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; }
+  .base { background: var(--g-base); } .clear { background: var(--g-clear); } .alert { background: var(--g-alert); } .derived { background: var(--g-derived); }
+  .rowlab { font-size: 11.5px; font-weight: 700; color: var(--muted); margin: 8px 0 2px; }
+  .keys { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; margin-top: 12px; }
+  .key { font-size: 12.5px; }
+  .key .sw { display: inline-block; width: 12px; height: 12px; border: 1px solid #9aa3ad; border-radius: 2px; vertical-align: -2px; margin-right: 5px; }
+  .ex { margin-top: 12px; border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px; background: var(--panel); font-size: 12.5px; }
+</style></head>
+<body>
+<p class="title">One 32-bit value per pixel: the evidence stored in Neon</p>
+<p class="sub">evidence.tif, version 1.1 of the compaction: 17 facts, all 32 bits used. Decode a fact with (value &gt;&gt; first bit) &amp; (2<sup>bits</sup> − 1).</p>
+
+<div class="rowlab">Bits 31 to 16</div>
+<div class="nums"><span>31</span><span>30</span><span>29</span><span>28</span><span>27</span><span>26</span><span>25</span><span>24</span><span>23</span><span>22</span><span>21</span><span>20</span><span>19</span><span>18</span><span>17</span><span>16</span></div>
+<div class="word">
+  <div class="f derived" style="grid-column: span 2">next to a confirmed clearing</div>
+  <div class="f alert" style="grid-column: span 2">optical alert confidence</div>
+  <div class="f alert" style="grid-column: span 3">latest optical alert year</div>
+  <div class="f base" style="grid-column: span 2">land, water or no data</div>
+  <div class="f derived" style="grid-column: span 2">Sentinel-2 cover after clearing</div>
+  <div class="f clear"><span class="v">RADD watches</span></div>
+  <div class="f clear"><span class="v">RADD high conf.</span></div>
+  <div class="f clear" style="grid-column: span 3">first RADD radar alert year</div>
+</div>
+
+<div class="rowlab">Bits 15 to 0</div>
+<div class="nums"><span>15</span><span>14</span><span>13</span><span>12</span><span>11</span><span>10</span><span>9</span><span>8</span><span>7</span><span>6</span><span>5</span><span>4</span><span>3</span><span>2</span><span>1</span><span>0</span></div>
+<div class="word">
+  <div class="f base"><span class="v">protected</span></div>
+  <div class="f base"><span class="v">Hansen to 2020</span></div>
+  <div class="f clear" style="grid-column: span 3">Hansen loss year after 2020</div>
+  <div class="f clear"><span class="v">TMF degraded</span></div>
+  <div class="f clear" style="grid-column: span 3">first TMF clearing year</div>
+  <div class="f base" style="grid-column: span 3">TMF class in 2020</div>
+  <div class="f base"><span class="v">rubber 2020</span></div>
+  <div class="f base" style="grid-column: span 2">JRC forest type</div>
+  <div class="f base"><span class="v">forest 2020</span></div>
+</div>
+
+<div class="keys">
+  <div class="key"><span class="sw" style="background:var(--g-base)"></span><b>2020 baseline:</b> forest on the cut-off date, its type, rubber, TMF's 2020 class, land or water, earlier Hansen loss, protected area</div>
+  <div class="key"><span class="sw" style="background:var(--g-clear)"></span><b>Clearing after 2020:</b> the first year each source sees it (3 bits: 0 none, 1–7 = 2021–2027), TMF degradation, RADD confidence and coverage</div>
+  <div class="key"><span class="sw" style="background:var(--g-alert)"></span><b>Near-real-time alerts:</b> the latest optical alert (GLAD-L or DIST-ALERT) and its confidence, for the months after the yearly data</div>
+  <div class="key"><span class="sw" style="background:var(--g-derived)"></span><b>Worked out at build time:</b> what Sentinel-2 shows after the clearing, and whether the pixel sits next to a confirmed clearing, so every query stays per pixel</div>
+</div>
+
+<div class="ex"><b>Example: 8,405,040</b>, the most common value on the Jambi map = land (bits 23–24 = 1) + TMF 2020 class 3, deforested land (bits 4–6) + Hansen loss in 2001–2020 (bit 14), every other field 0. The land was cleared before the cut-off, so it is not deforestation under the EUDR.</div>
+<script>addEventListener('load', () => document.body.setAttribute('data-h', Math.ceil(document.body.getBoundingClientRect().height)));</script>
+</body></html>

@@ -1,0 +1,50 @@
+FAST, FAITHFUL EUDR CHECKS FOR RUBBER PLOTS
+Team hacknhire (NTU) · SystemEarth Hack & Hire · 16 October 2026
+
+
+WHAT WE BUILT
+
+Rubber is one of the seven commodities covered by the EU Deforestation Regulation (EUDR). A rubber plot can supply the EU only if its land was not forest on 31 December 2020, or that forest has not been cleared since. Rubber makes this hard to check from space: plantations look like forest, and replanting looks like clearing.
+
+Answering that for one plot normally means opening about 20 satellite layers. We built a system that squeezes those layers into one small "evidence" file, stores it in a cloud database, and checks any number of plots against it in one query. Each plot gets the same answer the full layers would give: a verdict, the reason, the hectares involved and the year of clearing.
+
+We tested it on Jambi, Sumatra, one of Indonesia's main rubber regions: a 0.5 x 0.5 degree box, or 36 million pixels at 10 m. A desktop app lets a user draw or load farms, see their verdicts on a map, and compare the storage methods.
+
+
+THE DATA WE USED
+
+About 20 public satellite layers, covering 2000 to 2026:
+- Forest on the cut-off date: JRC Global Forest Cover 2020 (GFC2020), and JRC Global Forest Types 2020 (GFT2020).
+- Tree loss: Hansen Global Forest Change v1.13 (loss year and data mask), and JRC Tropical Moist Forests (TMF) yearly change for 2020 to 2025, including its deforestation and degradation years.
+- Alerts after the yearly data ends: RADD radar alerts (Wageningen University), DIST-ALERT optical alerts, and the UMD primary forest 2001 map (shows where radar watches).
+- Rubber: a rubber map of Southeast Asia, c. 2020.
+- Land cover after clearing: Impact Observatory yearly land cover (Sentinel-2).
+- Protected areas: WDPA.
+We tested on 1,000 made-up farm plots placed across every outcome (confirmed, probable, needs review, damaged forest, standing forest, rubber, cleared non-forest, recent alerts), plus the organiser's 17 plots from Thailand.
+
+
+HOW IT WORKS
+
+- We keep only what the EUDR decision needs. That is forest on the cut-off date, the rubber map, and the year each source (TMF, Hansen, RADD) first records a clearing. Yearly maps become one "first clearing year". Details the rule never reads, such as alert days, are dropped.
+- We treat rubber the way the EUDR does. Rubber plantations count as farmland, not forest (Art. 2(6)). So clearing on rubber land is flagged "needs review" as likely replanting, not failed as deforestation. Deforestation is "confirmed" only when two independent sources agree; one source gives "probable" or "needs review".
+- We pack all of this into one 32-bit number per pixel. Neon (cloud PostgreSQL) stores it as compressed 256 x 256 pixel pages. A check fetches every page under all the plots in one query, then runs the same rule code that built the map. So the answers cannot drift from the original.
+- We also store a simple 5-colour map (land, water, forest, deforestation, needs review) two more ways, as compressed bitmaps and as PostGIS shapes. These are for display and fast screening, and we compare all three on speed and size.
+- Tools: Python, Neon PostgreSQL with PostGIS, and a PyQt5 desktop app. Claude helped us write and review code. No AI model makes any compliance decision; the rule is fixed code.
+
+
+RESULTS (Jambi, 1,000 test plots)
+
+- Decision fidelity: 100%. All 1,000 plots get the same 35 outputs as from the original layers, including the verdict, reason, hectares and clearing years.
+- Pixel fidelity: 100% of the 36 million pixels in the decision map. The only information lost is what the decision never uses (alert days, yearly land-cover classes).
+- Storage: 6.7 MB in Neon, against 245.9 MB of raw layers (36x smaller) or 13.7 MB compressed (2x smaller).
+- Speed: 1,000 plots checked in 3.5 s over Neon, in one query (median of 3 runs). On local disk, 1.1 ms per plot against 10.9 ms from the original layers, about 10x faster, because a check reads 3 files instead of 21.
+- Cost: about $0.10 to $0.16 a month to store the evidence for all of Indonesia on cloud object storage (draft estimate).
+
+
+LIMITATIONS AND NEXT STEPS
+
+- The storage gain is modest against compressed originals (2x). The bigger win is the work each check saves. Next: store the coarser 30 m layers at their native size.
+- Fidelity is not accuracy. 100% means nothing the rule reads was lost, not that the rule is right. Our test plots are made up, and we agree on all 5 of the organiser's field-verified plots, but 5 is a small sample. Next: a larger accuracy check against field data.
+- The evidence keeps only what this rule needs, so a new rule (a different canopy threshold or cut-off date) means a rebuild. Next: archive the original layers alongside it.
+- We tested one region. TMF covers only tropical moist forest, so other regions need a variant of the rule. Social risks such as indigenous land rights and legality are not covered yet.
+- Next for speed: cache each farm's answer until its map tile changes, and scale to all of Indonesia's rubber areas.

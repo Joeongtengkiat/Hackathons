@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en-GB"><head><meta charset="utf-8"><title>Decision rule</title>
+<link rel="stylesheet" href="common.css">
+<style>
+  .part { font-size: 11.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px; }
+  .rows { display: grid; grid-template-columns: 250px 54px 1fr; row-gap: 0; align-items: center; }
+  .q { border: 1.5px solid var(--accent); background: var(--accent-wash); border-radius: 6px; padding: 6px 9px; }
+  .q b { color: var(--accent); }
+  .lab { font-size: 11.5px; color: var(--ink-2); text-align: center; }
+  .conn { display: flex; flex-direction: column; align-items: center; }
+  .chip { border: 1px solid var(--line); border-left: 6px solid; border-radius: 4px; padding: 5px 8px; background: #fff; }
+  .chip b { display: block; }
+  .down { display: flex; align-items: center; height: 22px; padding-left: 118px; font-size: 11.5px; color: var(--ink-2); gap: 6px; }
+  .branch { display: grid; grid-template-columns: 250px 54px 1fr; align-items: center; row-gap: 6px; margin-top: 6px; }
+  .src { border: 1px solid var(--line); border-radius: 4px; padding: 5px 8px; background: var(--panel); font-size: 12.5px; }
+  .note { border: 1px dashed var(--line); border-radius: 6px; padding: 6px 9px; margin-top: 8px; font-size: 12.5px; color: var(--ink-2); }
+  .ladder { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-top: 4px; align-items: stretch; }
+  .rung { border: 1px solid var(--line); border-top: 5px solid; padding: 6px 8px; background: #fff; font-size: 12.5px; }
+  .rung + .rung { border-left: 0; }
+  .rung b { display: block; font-size: 13px; }
+  hr { border: 0; border-top: 1px solid var(--line); margin: 12px 0 10px; }
+</style></head>
+<body>
+<p class="title">The EUDR decision rule: per pixel, then per plot</p>
+<p class="sub">Every question reads facts stored in the evidence, so the rule runs from the compact layers alone.</p>
+
+<p class="part">For each 10 m pixel</p>
+<div class="rows">
+  <div class="q"><b>Forest on 31 Dec 2020?</b> (JRC GFC2020: over 0.5 ha, trees over 5 m, canopy over 10%)</div>
+  <div class="conn"><span class="lab">no</span><svg width="50" height="10" viewBox="0 0 50 10"><path d="M2 5h40" stroke="#6b7280" stroke-width="1.5"/><path d="M40 1 48 5l-8 4z" fill="#6b7280"/></svg></div>
+  <div class="chip" style="border-left-color:var(--land)"><b>Not deforestation</b><span class="small">farmland, grass, rubber planted before the cut-off</span></div>
+</div>
+<div class="down"><svg width="10" height="22" viewBox="0 0 10 22"><path d="M5 0v14" stroke="#6b7280" stroke-width="1.5"/><path d="M1 13 5 21l4-8z" fill="#6b7280"/></svg>yes</div>
+<div class="rows">
+  <div class="q"><b>Does any source record clearing after 2020?</b> (TMF, Hansen, RADD radar)</div>
+  <div class="conn"><span class="lab">no</span><svg width="50" height="10" viewBox="0 0 50 10"><path d="M2 5h40" stroke="#6b7280" stroke-width="1.5"/><path d="M40 1 48 5l-8 4z" fill="#6b7280"/></svg></div>
+  <div class="chip" style="border-left-color:var(--forest)"><b>Forest still standing</b><span class="small">not deforestation</span></div>
+</div>
+<div class="down"><svg width="10" height="22" viewBox="0 0 10 22"><path d="M5 0v14" stroke="#6b7280" stroke-width="1.5"/><path d="M1 13 5 21l4-8z" fill="#6b7280"/></svg>yes</div>
+<div class="rows">
+  <div class="q"><b>On the 2020 rubber map?</b></div>
+  <div class="conn"><span class="lab">yes</span><svg width="50" height="10" viewBox="0 0 50 10"><path d="M2 5h40" stroke="#6b7280" stroke-width="1.5"/><path d="M40 1 48 5l-8 4z" fill="#6b7280"/></svg></div>
+  <div class="chip" style="border-left-color:var(--review)"><b>Needs review</b><span class="small">possible replanting, not new clearing</span></div>
+</div>
+<div class="down"><svg width="10" height="22" viewBox="0 0 10 22"><path d="M5 0v14" stroke="#6b7280" stroke-width="1.5"/><path d="M1 13 5 21l4-8z" fill="#6b7280"/></svg>no</div>
+<div class="q" style="width:250px"><b>Which sources record the clearing?</b></div>
+<div class="branch">
+  <div class="src">TMF <b>and</b> a second source (Hansen or RADD)</div>
+  <div class="conn"><svg width="50" height="10" viewBox="0 0 50 10"><path d="M2 5h40" stroke="#6b7280" stroke-width="1.5"/><path d="M40 1 48 5l-8 4z" fill="#6b7280"/></svg></div>
+  <div class="chip" style="border-left-color:var(--defor)"><b>Confirmed</b><span class="small">two independent sources agree</span></div>
+
+  <div class="src">TMF only, or Hansen <b>and</b> RADD</div>
+  <div class="conn"><svg width="50" height="10" viewBox="0 0 50 10"><path d="M2 5h40" stroke="#6b7280" stroke-width="1.5"/><path d="M40 1 48 5l-8 4z" fill="#6b7280"/></svg></div>
+  <div class="chip" style="border-left-color:#ec835a"><b>Probable</b><span class="small">a person or another dataset should confirm</span></div>
+
+  <div class="src">Hansen only, or RADD only</div>
+  <div class="conn"><svg width="50" height="10" viewBox="0 0 50 10"><path d="M2 5h40" stroke="#6b7280" stroke-width="1.5"/><path d="M40 1 48 5l-8 4z" fill="#6b7280"/></svg></div>
+  <div class="chip" style="border-left-color:var(--review)"><b>Needs review</b><span class="small">becomes <b style="display:inline">damaged forest</b> if RADD watched and saw nothing, TMF still sees forest 3+ years later, or Sentinel-2 shows trees every year since; becomes <b style="display:inline">probable</b> if Sentinel-2 now shows crops, bare or built-up land</span></div>
+</div>
+<div class="note"><b>After the yearly data (2026):</b> only near-real-time alerts can see a clearing. Radar and optical agree → probable; one high-confidence optical alert → needs review.<br>
+<b>Neighbours:</b> TMF's and Hansen's 30 m grids don't line up, so gaps of up to about 60 m inside a confirmed clearing count as confirmed, and single-source pixels within 30 m of one become probable.</div>
+
+<hr>
+<p class="part">For each plot: the worst pixel inside decides</p>
+<div class="ladder">
+  <div class="rung" style="border-top-color:#d03b3b"><b>Non-compliant</b>any confirmed pixel</div>
+  <div class="rung" style="border-top-color:#ec835a"><b>Probable deforestation</b>else any probable pixel</div>
+  <div class="rung" style="border-top-color:#fab219"><b>Needs review</b>else any needs-review pixel</div>
+  <div class="rung" style="border-top-color:#0ca30c"><b>Deforestation-free</b>none of these</div>
+</div>
+<p class="small" style="margin:6px 0 0">Part of the plot without data → <b>not assessed</b>. The cut-off year, the sources required, rubber handling, alert confidence, point-plot size, minimum area and the protected-area threshold are all parameters.</p>
+<script>addEventListener('load', () => document.body.setAttribute('data-h', Math.ceil(document.body.getBoundingClientRect().height)));</script>
+</body></html>

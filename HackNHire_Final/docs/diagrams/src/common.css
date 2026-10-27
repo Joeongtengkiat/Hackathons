@@ -1,0 +1,56 @@
+/* Shared look for the memo's figures: Calibri like the memo, white page, one accent. */
+:root {
+  --ink: #1f2328;
+  --ink-2: #4b5563;
+  --muted: #6b7280;
+  --line: #c9ced6;
+  --panel: #f6f7f9;
+  --accent: #1f4d78;          /* the memo's sub-heading blue */
+  --accent-wash: #e8f0f8;
+  --land: #e1e1e1;
+  --water: #6baed6;
+  --forest: #1b7837;
+  --defor: #e31a1c;
+  --review: #6a3d9a;
+  --protected: #ffd000;
+  --evidence: #2a78d6;
+  --stencils: #eb6834;
+  --outlines: #1baf7a;
+  --bad: #d03b3b;
+  --warn: #ec835a;
+  --good: #0ca30c;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #ffffff; }
+body {
+  width: 680px;
+  padding: 14px 16px 16px;
+  font-family: Calibri, "Segoe UI", system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.3;
+  color: var(--ink);
+}
+.title { font-size: 15px; font-weight: 700; margin: 0 0 2px; }
+.sub { font-size: 12.5px; color: var(--ink-2); margin: 0 0 10px; }
+.box {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  padding: 7px 8px;
+}
+.panel { background: var(--panel); }
+.head {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+.small { font-size: 12px; color: var(--ink-2); }
+.mono { font-family: Consolas, "Cascadia Mono", monospace; font-size: 11.5px; }
+ul.tight { margin: 0; padding-left: 14px; }
+ul.tight li { margin: 1px 0; }
+.swatch {
+  display: inline-block; width: 10px; height: 10px; border-radius: 2px;
+  vertical-align: -1px; margin-right: 4px;
+}
+.arrow svg { display: block; }

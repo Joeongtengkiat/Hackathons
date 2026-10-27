@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en-GB"><head><meta charset="utf-8"><title>Three representations</title>
+<link rel="stylesheet" href="common.css">
+<style>
+  .cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .col { border: 1px solid var(--line); border-top: 5px solid; border-radius: 6px; padding: 8px 9px 9px; display: flex; flex-direction: column; gap: 6px; }
+  .name { font-size: 14px; font-weight: 700; }
+  .lbl { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
+  .pic { display: flex; align-items: center; gap: 6px; min-height: 104px; }
+  .pal { font-size: 10.5px; line-height: 1.25; border: 1px solid var(--line); border-radius: 3px; padding: 3px 5px; background: #fff; }
+  .row { font-size: 11px; border: 1px dashed #9aa3ad; border-radius: 3px; padding: 3px 5px; background: #fff; text-align: center; }
+  .steps { display: flex; flex-direction: column; gap: 3px; }
+  .st { font-size: 12px; border-radius: 4px; padding: 4px 6px; background: var(--panel); border: 1px solid #e3e6ea; }
+  .st.server { background: #e9f6f0; border-color: #bfe5d3; }
+  .st.client { background: #fdf0e8; border-color: #f4cdb6; }
+  .dn { text-align: center; color: var(--muted); font-size: 10px; line-height: 1; }
+  .ans { font-size: 12px; }
+  .meas { margin-top: auto; border-top: 1px solid #e3e6ea; padding-top: 5px; font-size: 12px; color: var(--ink-2); }
+  .meas b { color: var(--ink); }
+  .legend { display: flex; gap: 14px; margin-top: 9px; font-size: 12px; color: var(--ink-2); flex-wrap: wrap; }
+</style></head>
+<body>
+<p class="title">Three ways to store the same 256 × 256-pixel page in Neon</p>
+<p class="sub">Each map is cut into 256 × 256 pages. Pages that hold only the most common value get no row, and every representation rebuilds the map pixel for pixel.</p>
+
+<div class="cols">
+  <div class="col" style="border-top-color:var(--evidence)">
+    <div class="name">Evidence pages</div>
+    <div class="small">All 17 facts per pixel (32 bits): Joe's evidence.tif itself</div>
+    <div class="lbl">Stored as</div>
+    <div class="pic"><svg id="ev" width="72" height="72"></svg>
+      <div class="pal mono">palette<br>#0 8,405,040<br>#1 …<br>#2 …<br>(median 24)<br>+ 1 byte/pixel</div></div>
+    <div class="row">zlib → one row per page</div>
+    <div class="lbl">A check</div>
+    <div class="steps">
+      <div class="st">1 query fetches the pages under all the plots</div><div class="dn">▼</div>
+      <div class="st client">On the client: Joe's own plot mask and rule (judge)</div>
+    </div>
+    <div class="ans"><b>Answers:</b> verdict, reason, hectares of 2020 forest and of each kind of clearing, years, DDS fields (35 outputs)</div>
+    <div class="meas">Jambi box: <b>6.8 MB</b> stored</div>
+  </div>
+
+  <div class="col" style="border-top-color:var(--stencils)">
+    <div class="name">Stencils</div>
+    <div class="small">The outcome in 5 colours, one byte per pixel</div>
+    <div class="lbl">Stored as</div>
+    <div class="pic"><svg id="st" width="72" height="72"></svg>
+      <div class="pal mono">colour codes<br>0 land<br>1 water<br>2 forest<br>3 deforestation<br>4 needs review</div></div>
+    <div class="row">LZMA2 → one row per page</div>
+    <div class="lbl">A check</div>
+    <div class="steps">
+      <div class="st">1 query fetches the pages under all the plots</div><div class="dn">▼</div>
+      <div class="st client">On the client: count the pixels inside each plot</div>
+    </div>
+    <div class="ans"><b>Answers:</b> colours touched, hectares of each, the colour under a point, verdict</div>
+    <div class="meas">Jambi box: <b>0.8 MB</b> stored</div>
+  </div>
+
+  <div class="col" style="border-top-color:var(--outlines)">
+    <div class="name">Outlines</div>
+    <div class="small">The outcome in 5 colours, as PostGIS polygons</div>
+    <div class="lbl">Stored as</div>
+    <div class="pic"><svg id="ol" width="72" height="72"></svg>
+      <div class="pal mono">polygons along<br>pixel edges,<br>every colour but<br>the most common<br>+ GiST index</div></div>
+    <div class="row">plus 16 × 16 square labels</div>
+    <div class="lbl">A check</div>
+    <div class="steps">
+      <div class="st">All plots sent as one array (unnest)</div><div class="dn">▼</div>
+      <div class="st server">In the database: PostGIS finds nearby outlines and measures each overlap</div>
+    </div>
+    <div class="ans"><b>Answers:</b> colours touched, exact hectares of each, verdict; plots in one colour skip the geometry</div>
+    <div class="meas">Jambi box: <b>31.3 MB</b> stored</div>
+  </div>
+</div>
+<div class="legend">
+  <span><span class="swatch" style="background:#fdf0e8;border:1px solid #f4cdb6"></span>work on the client</span>
+  <span><span class="swatch" style="background:#e9f6f0;border:1px solid #bfe5d3"></span>work in the database</span>
+  <span><span class="swatch" style="background:var(--land)"></span>land</span>
+  <span><span class="swatch" style="background:var(--water)"></span>water</span>
+  <span><span class="swatch" style="background:var(--forest)"></span>forest</span>
+  <span><span class="swatch" style="background:var(--defor)"></span>deforestation</span>
+  <span><span class="swatch" style="background:var(--review)"></span>needs review</span>
+</div>
+<script>
+const G = ["00022220","00222220","00223320","00233320","00033422","01100422","01100022","00000002"]
+  .map(r => r.split("").map(Number));
+const FILL = ["#e1e1e1", "#6baed6", "#1b7837", "#e31a1c", "#6a3d9a"];
+const N = 8, C = 9, NS = "http://www.w3.org/2000/svg";
+function el(svg, tag, attrs) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); svg.appendChild(e); return e; }
+function cells(svg, fill, digits) {
+  for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
+    el(svg, "rect", { x: c * C, y: r * C, width: C, height: C, fill: fill(G[r][c]), stroke: "#ffffff", "stroke-width": 0.6 });
+    if (digits) { const t = el(svg, "text", { x: c * C + C / 2, y: r * C + C / 2 + 2.6, "font-size": 7, "text-anchor": "middle",
+      fill: G[r][c] >= 2 ? "#ffffff" : "#1f2328", "font-family": "Consolas, monospace" }); t.textContent = G[r][c]; }
+  }
+}
+cells(document.getElementById("ev"), v => FILL[v], true);
+cells(document.getElementById("st"), v => FILL[v], true);
+const ol = document.getElementById("ol");
+cells(ol, v => v === 0 ? "#f4f4f4" : FILL[v] + "55", false);
+for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
+  const v = G[r][c]; if (v === 0) continue;
+  const same = (rr, cc) => rr >= 0 && rr < N && cc >= 0 && cc < N && G[rr][cc] === v;
+  const x = c * C, y = r * C, s = { stroke: FILL[v], "stroke-width": 1.8, "stroke-linecap": "square" };
+  if (!same(r - 1, c)) el(ol, "line", { x1: x, y1: y, x2: x + C, y2: y, ...s });
+  if (!same(r + 1, c)) el(ol, "line", { x1: x, y1: y + C, x2: x + C, y2: y + C, ...s });
+  if (!same(r, c - 1)) el(ol, "line", { x1: x, y1: y, x2: x, y2: y + C, ...s });
+  if (!same(r, c + 1)) el(ol, "line", { x1: x + C, y1: y, x2: x + C, y2: y + C, ...s });
+}
+addEventListener('load', () => document.body.setAttribute('data-h', Math.ceil(document.body.getBoundingClientRect().height)));
+</script>
+</body></html>

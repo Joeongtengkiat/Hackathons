@@ -1,0 +1,25 @@
+# The Docker image is built from the HackNHire folder (docker build -f backend/Dockerfile ...), so that
+# it can read the one requirements.txt. Only the backend goes into it.
+
+# Never bake your Neon password into the image - it is read from the mounted folder instead
+**/.env
+**/.env.txt
+
+# Not the backend
+.git/
+frontend/
+docs/
+
+# Outputs, caches and local environments
+**/database/results/
+**/compare/results/
+**/__pycache__/
+**/venv/
+**/.venv/
+
+# Your maps, layers and farms are shared at run time with -v, not copied into the image
+**/layers/
+**/data/
+**/*.tif
+**/*.tiff
+**/*.geojson

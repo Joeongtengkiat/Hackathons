@@ -1,0 +1,26 @@
+# Every Python package the project uses (Python 3.10 or newer): the backend (pipeline.py, compaction/,
+# database/, compare/), the ingest window (backend/ingest_app.py) and the desktop app (frontend/).
+#
+# Install into each environment, from the HackNHire folder:
+#   backend\venv\Scripts\python -m pip install -r requirements.txt
+#   frontend\.venv\Scripts\python -m pip install -r requirements.txt
+# The Docker image (backend/Dockerfile) installs it without the PyQt5 lines: it runs no windows.
+
+# Maps, rasters and shapes
+numpy>=1.24
+rasterio>=1.3.9
+shapely>=2.0
+pyproj>=3.6
+
+# Step 1, compaction (backend/compaction/eudr_layers.py)
+scipy>=1.10
+pandas>=2.0
+geopandas>=0.14
+pyogrio>=0.7
+
+# Step 2, storage in Neon
+psycopg[binary]>=3.1
+
+# The windows: the ingest window (backend/ingest_app.py) and the desktop app (frontend/app.py)
+PyQt5>=5.15
+PyQtWebEngine>=5.15

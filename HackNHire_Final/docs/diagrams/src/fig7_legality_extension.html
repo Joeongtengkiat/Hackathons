@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en-GB"><head><meta charset="utf-8"><title>Legality extension</title>
+<link rel="stylesheet" href="common.css">
+<style>
+  .flow { display: grid; grid-template-columns: 200px 18px 220px 18px 1fr; align-items: stretch; }
+  .col { display: flex; flex-direction: column; gap: 6px; }
+  .arrow { display: flex; align-items: center; justify-content: center; }
+  .step { font-size: 11.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+  .grp { font-weight: 700; font-size: 12.5px; margin: 4px 0 1px; }
+  .tag { display: inline-block; font-size: 10.5px; font-weight: 700; border-radius: 3px; padding: 0 4px; margin-left: 3px; vertical-align: 1px; }
+  .now { background: #e2f3e2; color: #1d6b1d; border: 1px solid #b9dfb9; }
+  .new { background: var(--accent-wash); color: var(--accent); border: 1px solid #bcd0e6; }
+  .tblrow { border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 4px; padding: 5px 7px; background: #fff; font-size: 12px; }
+  .tblrow b { font-family: Consolas, monospace; font-size: 11.5px; }
+  .res { border: 1px solid var(--line); border-radius: 4px; padding: 5px 7px; background: #fff; font-size: 12px; }
+  .oc div { font-size: 12px; margin: 2px 0; }
+  .gap { margin-top: 10px; border: 1px dashed var(--line); border-radius: 6px; padding: 6px 9px; font-size: 12.5px; color: var(--ink-2); }
+</style></head>
+<body>
+<p class="title">Extending the check to legality, the way protected areas already work</p>
+<p class="sub">EUDR Article 3(b) asks that production follows the country's laws. The parts of Article 2(40) that depend on where a plot is can be checked like protected areas: boundaries stored with the map, one batched overlap query.</p>
+
+<div class="flow">
+  <div class="col">
+    <div class="step">Legal boundaries</div>
+    <div class="box panel" style="flex:1">
+      <div class="grp">Indonesia</div>
+      <ul class="tight small">
+        <li>State forest estate (kawasan hutan) by function: HK, HL, HP, HPT, HPK, or APL outside it <span class="tag new">2(40)(a)</span></li>
+        <li>Moratorium map (PIPPIB) and peat with a protection function <span class="tag new">(b)</span></li>
+        <li>Concessions: HGU, HTI, PBPH <span class="tag new">(d)</span></li>
+        <li>Customary territories (BRWA), social forestry permits <span class="tag new">(g)</span></li>
+        <li>WDPA protected areas <span class="tag now">today</span></li>
+      </ul>
+      <div class="grp">Thailand</div>
+      <ul class="tight small">
+        <li>National reserved forests <span class="tag new">(a)</span></li>
+        <li>Land-reform areas (ALRO) <span class="tag new">(a)</span></li>
+        <li>National parks, wildlife sanctuaries (WDPA) <span class="tag now">today</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="arrow"><svg width="18" height="14" viewBox="0 0 18 14"><path d="M1 7h12" stroke="#6b7280" stroke-width="1.6"/><path d="M11 2.5 17 7l-6 4.5z" fill="#6b7280"/></svg></div>
+
+  <div class="col">
+    <div class="step">Stored with each map in Neon</div>
+    <div class="tblrow"><b>legal_areas</b><br>layer, category, source and date, attributes, geometry with a GiST index. Generalises today's <span class="mono">protected_areas</span></div>
+    <div class="tblrow"><b>legal_rules</b><br>layer and category → effect: prohibited, needs a permit, needs FPIC evidence, or information only; minimum overlap. A change in the law is a row, not a rebuild</div>
+    <div class="tblrow"><b>plot_documents</b><br>land title or STDB, permit or release decree, FPIC record: what the maps can't show</div>
+    <div class="tblrow" style="border-left-color:var(--evidence)"><b>legal bits</b> (optional)<br>boundaries rasterised onto the 10 m grid, like today's protected bit, for screening with no extra query</div>
+  </div>
+  <div class="arrow"><svg width="18" height="14" viewBox="0 0 18 14"><path d="M1 7h12" stroke="#6b7280" stroke-width="1.6"/><path d="M11 2.5 17 7l-6 4.5z" fill="#6b7280"/></svg></div>
+
+  <div class="col">
+    <div class="step">Per batch of plots</div>
+    <div class="res" style="text-align:center"><b>1 batched overlap query</b><br>(the outlines' pattern: unnest, ST_Intersects, overlap area)</div>
+    <div class="res"><b>Per plot</b>
+      <ul class="tight" style="margin-top:2px">
+        <li>legal status of the land</li>
+        <li>each overlap: name, category, hectares</li>
+        <li>its effect, and the documents still missing</li>
+      </ul>
+    </div>
+    <div class="res oc"><b>Legality outcome</b>, beside the deforestation verdict
+      <div><span class="swatch" style="background:#0ca30c"></span>no issue found</div>
+      <div><span class="swatch" style="background:#fab219"></span>documents needed</div>
+      <div><span class="swatch" style="background:#d03b3b"></span>likely illegal: a person must check</div>
+    </div>
+  </div>
+</div>
+<div class="gap"><b>Not mappable:</b> labour rights (e), human rights (f), and tax, anti-corruption, trade and customs rules (h). These stay a document checklist per supplier, weighted by the country's EU risk benchmark.</div>
+<script>addEventListener('load', () => document.body.setAttribute('data-h', Math.ceil(document.body.getBoundingClientRect().height)));</script>
+</body></html>

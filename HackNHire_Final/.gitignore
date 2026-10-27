@@ -1,0 +1,27 @@
+# Neon password - never commit it (backend/.env)
+.env
+.env.*
+*.env
+# ...except the example, which holds no password (copy it to backend/.env)
+!.env.example
+
+# Local environments and caches
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Personal notes for Claude Code (CLAUDE.md itself is shared)
+CLAUDE.local.md
+.superpowers/
+
+# Outputs
+backend/database/results/
+backend/compare/results/
+
+# Satellite layers, maps and farms are customer data - keep them out of Git. The maps the
+# compaction step builds go to backend/layers/<map>/; tests make their own data in temporary folders.
+backend/layers/
+*.tif
+*.tiff
+*.geojson
